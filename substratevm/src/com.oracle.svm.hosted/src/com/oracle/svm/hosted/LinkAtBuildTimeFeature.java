@@ -25,7 +25,6 @@
 
 package com.oracle.svm.hosted;
 
-import java.lang.module.ModuleDescriptor;
 import java.lang.module.ModuleFinder;
 import java.net.URI;
 import java.nio.file.Path;
@@ -41,6 +40,7 @@ import org.graalvm.compiler.options.Option;
 import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.hosted.Feature;
 
+import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.svm.core.ClassLoaderSupport;
 import com.oracle.svm.core.annotate.AutomaticFeature;
 import com.oracle.svm.core.option.APIOption;
@@ -128,11 +128,11 @@ public final class LinkAtBuildTimeFeature implements Feature {
         assert !clazz.isPrimitive() : "Primitive classes are not loaded via NativeImageClassLoader";
 
         var module = clazz.getModule();
-        if (module.isNamed() && (requireCompleteModules.contains(module) || isModuleSynthetic(module))) {
+        if (module.isNamed() && (requireCompleteModules.contains(module))) {
             return true;
         }
 
-        return requireCompletePackageOrClass.containsKey(clazz.getName()) || requireCompletePackageOrClass.containsKey(clazz.getPackageName()) || clazz.isSynthetic();
+        return requireCompletePackageOrClass.containsKey(clazz.getName()) || requireCompletePackageOrClass.containsKey(clazz.getPackageName());
     }
 
     public static boolean isModuleSynthetic(Module m) {
